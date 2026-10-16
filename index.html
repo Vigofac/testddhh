@@ -6,24 +6,26 @@
     <title>Juego Didáctico: DDHH, DIH, DICA y Simbología de Protección</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        ddhh: '#2563eb',   /* Blue */
+                        dih: '#dc2626',    /* Red */
+                        dica: '#16a34a',   /* Green */
+                        simbolo: '#9333ea',/* Purple */
+                        dilema: '#ea580c', /* Orange */
+                    }
+                }
+            }
+        }
+    </script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #020617;
-            color: #f8fafc;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            margin: 0;
-            padding: 1rem;
-            user-select: none;
         }
-        /* Estilos de respaldo críticos por si falla el CDN */
-        .hidden-custom { display: none !important; }
-        .flex-custom { display: flex !important; }
     </style>
 </head>
 <body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col items-center justify-center p-4 sm:p-6 select-none">
@@ -34,7 +36,7 @@
         <!-- Header: Title, Logo and Status -->
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-slate-800">
             <div class="flex items-center gap-3">
-                <!-- Logo de Vigopilot rectangular completo (Asegurado con CSS nativo) -->
+                <!-- Logo rectangular completo de Vigopilot -->
                 <img src="logoforms.png" alt="Logo Vigopilot" style="border-radius: 8px !important; width: auto !important; height: 50px !important; object-fit: contain !important; display: block !important;" class="border border-slate-700/80 bg-slate-950 p-1 shadow-md shrink-0">
                 <div>
                     <h1 class="text-xl sm:text-2xl font-bold tracking-tight text-white flex items-center gap-2">
@@ -502,6 +504,7 @@
             } else {
                 nextBtn.querySelector('span').innerText = "Siguiente Pregunta";
             }
+            nextBtn.classList.add('hidden'); // Fix: keep hidden until options clicked/managed correctly or shown properly
             nextBtn.classList.remove('hidden');
         }
 
