@@ -6,26 +6,24 @@
     <title>Juego Didáctico: DDHH, DIH, DICA y Simbología de Protección</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        ddhh: '#2563eb',   /* Blue */
-                        dih: '#dc2626',    /* Red */
-                        dica: '#16a34a',   /* Green */
-                        simbolo: '#9333ea',/* Purple */
-                        dilema: '#ea580c', /* Orange */
-                    }
-                }
-            }
-        }
-    </script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
         body {
             font-family: 'Inter', sans-serif;
+            background-color: #020617;
+            color: #f8fafc;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            margin: 0;
+            padding: 1rem;
+            user-select: none;
         }
+        /* Estilos de respaldo críticos por si falla el CDN */
+        .hidden-custom { display: none !important; }
+        .flex-custom { display: flex !important; }
     </style>
 </head>
 <body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col items-center justify-center p-4 sm:p-6 select-none">
@@ -36,8 +34,8 @@
         <!-- Header: Title, Logo and Status -->
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-slate-800">
             <div class="flex items-center gap-3">
-                <!-- Logo de Vigopilot rectangular completo -->
-                <img src="logoforms.png" alt="Logo Vigopilot" style="border-radius: 8px !important; width: auto !important; height: 50px !important; object-fit: contain !important;" class="border border-slate-700/80 bg-slate-950 p-1 shadow-md shrink-0">
+                <!-- Logo de Vigopilot rectangular completo (Asegurado con CSS nativo) -->
+                <img src="logoforms.png" alt="Logo Vigopilot" style="border-radius: 8px !important; width: auto !important; height: 50px !important; object-fit: contain !important; display: block !important;" class="border border-slate-700/80 bg-slate-950 p-1 shadow-md shrink-0">
                 <div>
                     <h1 class="text-xl sm:text-2xl font-bold tracking-tight text-white flex items-center gap-2">
                         🛡️ Misión Legitimidad & Normativa
@@ -438,4 +436,116 @@
                 btn.className = `w-full text-left p-4 rounded-xl border border-slate-800 bg-slate-950/70 hover:bg-slate-800/80 hover:border-slate-700 text-slate-200 font-medium text-sm sm:text-base transition-all duration-150 flex items-start gap-3 group`;
                 btn.onclick = () => selectOption(index);
                 btn.innerHTML = `
-                    <span class="inline-flex items-center justify-center w-6 h
+                    <span class="inline-flex items-center justify-center w-6 h-6 rounded-lg bg-slate-800 text-slate-400 text-xs font-bold shrink-0 group-hover:bg-slate-700 group-hover:text-white transition-colors">
+                        ${String.fromCharCode(65 + index)}
+                    </span>
+                    <span class="leading-snug">${optText}</span>
+                `;
+                container.appendChild(btn);
+            });
+
+            // Feedback & Next Button Reset
+            const fbPanel = document.getElementById('feedback-panel');
+            fbPanel.classList.add('hidden');
+            document.getElementById('next-btn').classList.add('hidden');
+        }
+
+        function selectOption(index) {
+            if (selectedOptionIndex !== null) return; // Prevent re-selection
+            selectedOptionIndex = index;
+
+            const q = questions[currentQuestion];
+            const isCorrect = (index === q.ans);
+            const container = document.getElementById('options-container');
+            const buttons = container.querySelectorAll('button');
+
+            // Disable all buttons
+            buttons.forEach(btn => btn.disabled = true);
+
+            if (isCorrect) {
+                score += 100;
+                correctAnswersCount++;
+                document.getElementById('score').innerText = score + " pts";
+
+                buttons[index].className = `w-full text-left p-4 rounded-xl border-2 border-emerald-500 bg-emerald-950/40 text-emerald-100 font-medium text-sm sm:text-base flex items-start gap-3 shadow-lg shadow-emerald-950/50`;
+                buttons[index].querySelector('span').className = `inline-flex items-center justify-center w-6 h-6 rounded-lg bg-emerald-500 text-slate-950 text-xs font-black shrink-0`;
+            } else {
+                buttons[index].className = `w-full text-left p-4 rounded-xl border-2 border-red-500 bg-red-950/40 text-red-100 font-medium text-sm sm:text-base flex items-start gap-3 shadow-lg shadow-red-950/50`;
+                buttons[index].querySelector('span').className = `inline-flex items-center justify-center w-6 h-6 rounded-lg bg-red-500 text-white text-xs font-bold shrink-0`;
+            }
+
+            // Highlight the correct answer if the user got it wrong
+            if (!isCorrect) {
+                buttons[q.ans].className = `w-full text-left p-4 rounded-xl border-2 border-emerald-500 bg-emerald-950/40 text-emerald-100 font-medium text-sm sm:text-base flex items-start gap-3 shadow-lg shadow-emerald-950/50`;
+                buttons[q.ans].querySelector('span').className = `inline-flex items-center justify-center w-6 h-6 rounded-lg bg-emerald-500 text-slate-950 text-xs font-black shrink-0`;
+            }
+
+            // Show Feedback Panel
+            const fbPanel = document.getElementById('feedback-panel');
+            const fbTitle = document.getElementById('feedback-title');
+            const fbText = document.getElementById('feedback-text');
+
+            if (isCorrect) {
+                fbPanel.className = `rounded-xl p-4 sm:p-5 border text-sm leading-relaxed mb-6 transition-all duration-300 bg-emerald-950/60 border-emerald-800/80 text-emerald-200`;
+                fbTitle.innerHTML = `✅ ¡Respuesta Correcta!`;
+            } else {
+                fbPanel.className = `rounded-xl p-4 sm:p-5 border text-sm leading-relaxed mb-6 transition-all duration-300 bg-red-950/60 border-red-800/80 text-red-200`;
+                fbTitle.innerHTML = `❌ Respuesta Incorrecta`;
+            }
+            fbText.innerText = q.exp;
+            fbPanel.classList.remove('hidden');
+
+            // Show Next Button or Finish
+            const nextBtn = document.getElementById('next-btn');
+            if (currentQuestion === questions.length - 1) {
+                nextBtn.querySelector('span').innerText = "Ver Resultados Finales";
+            } else {
+                nextBtn.querySelector('span').innerText = "Siguiente Pregunta";
+            }
+            nextBtn.classList.remove('hidden');
+        }
+
+        function nextQuestion() {
+            currentQuestion++;
+            if (currentQuestion < questions.length) {
+                loadQuestion();
+            } else {
+                showResults();
+            }
+        }
+
+        function showResults() {
+            document.getElementById('quiz-screen').classList.add('hidden');
+            const resScreen = document.getElementById('result-screen');
+            resScreen.classList.remove('hidden');
+            resScreen.classList.add('flex');
+
+            document.getElementById('final-score').innerText = score;
+            document.getElementById('correct-count').innerText = correctAnswersCount;
+
+            // Evaluation message and badge based on score
+            const badgeEl = document.getElementById('result-badge');
+            const msgEl = document.getElementById('eval-message');
+            const percentage = (correctAnswersCount / questions.length) * 100;
+
+            if (percentage >= 90) {
+                badgeEl.innerText = "🏆";
+                msgEl.innerHTML = `<strong>¡Excelente desempeño!</strong> Demuestras un dominio sobresaliente y riguroso de los Derechos Humanos, el DIH, el DICA y la Simbología de Protección. Estás plenamente preparado para liderar con total legitimidad operativa.`;
+            } else if (percentage >= 70) {
+                badgeEl.innerText = "🎖️";
+                msgEl.innerHTML = `<strong>¡Buen trabajo!</strong> Posees una sólida comprensión de las normativas operativas y los principios fundamentales, aunque se sugiere repasar algunos escenarios específicos de dilemas y simbología.`;
+            } else {
+                badgeEl.innerText = "⚠️";
+                msgEl.innerHTML = `<strong>Requiere Refuerzo:</strong> Es necesario repasar los conceptos fundamentales del DIH, DICA, DDHH y la correcta identificación de la simbología de protección para garantizar la estricta legitimidad en las operaciones.`;
+            }
+        }
+
+        function restartQuiz() {
+            initQuiz();
+        }
+
+        // Initialize on load
+        window.onload = initQuiz;
+    </script>
+</body>
+</html>
